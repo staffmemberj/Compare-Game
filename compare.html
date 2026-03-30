@@ -98,11 +98,12 @@
             font-weight: 700;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             z-index: 10;
+            user-select: none;
         }
 
         #chat-window {
             flex: 1;
-            padding: 2vh 1.5vw;
+            padding: 2vh 1.5vw 6vh 1.5vw; /* Extra bottom padding so bubbles aren't cut off */
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -409,52 +410,30 @@
             box-shadow: 0 0 0 #218c53;
         }
 
-        /* --- Mobile Toggle Button --- */
-        #mobile-chat-toggle {
-            display: none;
-            position: fixed;
-            bottom: 3vh;
-            right: 4vw;
-            background: #1e90ff;
-            color: white;
-            border: 3px solid #0984e3;
-            width: 8vh;
-            height: 8vh;
-            border-radius: 50%;
-            font-size: 4vh;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2), 0 6px 0 #0984e3;
-            z-index: 200;
-            cursor: pointer;
-            transition: transform 0.2s var(--bounce);
-        }
-        #mobile-chat-toggle:active {
-            transform: translateY(6px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 0px 0 #0984e3;
-        }
-
         /* --- Mobile Layout Overrides --- */
         @media (max-width: 850px) {
             #chat-area-container {
                 position: fixed;
-                bottom: -100%;
+                bottom: 0;
                 left: 0;
                 width: 100%;
                 max-width: 100%;
                 height: 85vh;
                 padding: 0;
                 background: transparent;
-                transition: bottom 0.4s var(--bounce);
+                /* Peek out exactly 8vh */
+                transform: translateY(calc(100% - 8vh));
+                transition: transform 0.4s var(--bounce);
                 z-index: 150;
             }
 
             #chat-area-container.open {
-                bottom: 0;
+                transform: translateY(0);
             }
 
             #chat-app {
-                border-radius: 30px 30px 0 0;
+                border-radius: 25px 25px 0 0;
                 border: none;
-                border-top: 8px solid var(--main-teal);
                 box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
             }
 
@@ -463,33 +442,37 @@
             }
 
             #chat-header {
-                padding-top: 2vh;
+                height: 8vh;
+                padding: 0;
                 display: flex;
-                justify-content: space-between;
+                justify-content: center;
                 align-items: center;
+                position: relative;
+                cursor: pointer; /* Makes the whole header clickable */
             }
 
             .close-chat-btn {
-                display: block !important;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                right: 4vw;
                 background: rgba(255,255,255,0.2);
                 border: none;
                 color: white;
                 font-weight: bold;
-                padding: 0.5vh 3vw;
+                width: 4vh;
+                height: 4vh;
                 border-radius: 10px;
                 font-family: inherit;
-            }
-
-            #mobile-chat-toggle {
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                pointer-events: none; /* Let the header block receive clicks */
+                font-size: 2vh;
             }
 
             #cards-container {
                 gap: 4vw;
                 align-items: flex-start;
-                padding-bottom: 12vh; /* Space for the floating button */
+                padding-bottom: 12vh; /* Give space for peeking chat window */
             }
 
             .item-card {
@@ -528,16 +511,15 @@
             <div id="cards-container">
                 <!-- Cards injected via JS -->
             </div>
-            <button id="mobile-chat-toggle" onclick="toggleMobileChat()">💬</button>
         </div>
 
         <!-- Right Side: Chat Interface -->
         <div id="chat-area-container">
             <div id="chat-app">
                 <div class="phone-notch"></div>
-                <div id="chat-header">
+                <div id="chat-header" onclick="toggleMobileChat()">
                     <span>Teacher Bot 🤖</span>
-                    <button class="close-chat-btn" onclick="toggleMobileChat()">▼</button>
+                    <button class="close-chat-btn">▲</button>
                 </div>
                 
                 <div id="chat-window">
@@ -642,10 +624,25 @@
         }
 
         /* --- UI Controls --- */
+        function setMobileChatState(isOpen) {
+            if (window.innerWidth > 850) return; // Desktop is always visible
+            const chatContainer = document.getElementById('chat-area-container');
+            const btn = document.querySelector('.close-chat-btn');
+            
+            if (isOpen) {
+                chatContainer.classList.add('open');
+                btn.innerText = '▼';
+            } else {
+                chatContainer.classList.remove('open');
+                btn.innerText = '▲';
+            }
+        }
+
         function toggleMobileChat() {
+            if (window.innerWidth > 850) return; // Ignore clicks on desktop
             playSound('tap');
             const chatContainer = document.getElementById('chat-area-container');
-            chatContainer.classList.toggle('open');
+            setMobileChatState(!chatContainer.classList.contains('open'));
         }
 
         function scrollToBottom() {
@@ -798,7 +795,7 @@
                 distractors.push("than");
             }
 
-            // Cleanup punctuation from distractors just in case, though they are usually plain words
+            // Cleanup punctuation from distractors just in case
             distractors = distractors.filter(d => !correctWords.includes(d));
 
             let fullBank = [...correctWords, ...distractors.slice(0, 4)];
@@ -810,11 +807,9 @@
                 addBubble(question, "bot-bubble");
                 
                 // Pop open the mobile chat automatically on round start to prompt user
-                if (window.innerWidth <= 850) {
-                    setTimeout(() => {
-                        document.getElementById('chat-area-container').classList.add('open');
-                    }, 500);
-                }
+                setTimeout(() => {
+                    setMobileChatState(true);
+                }, 500);
 
                 setTimeout(() => {
                     renderWordBank(fullBank);
@@ -834,7 +829,8 @@
 
                 let statsHtml = '';
                 for (let stat in statConfig) {
-                    let formattedVal = item.currentStats[stat];
+                    // Format number with commas (e.g., 50000 -> 50,000)
+                    let formattedVal = Number(item.currentStats[stat]).toLocaleString('en-US');
                     if (statConfig[stat].label.includes("$")) formattedVal = "$" + formattedVal;
                     
                     statsHtml += `
@@ -990,8 +986,7 @@
         }
 
         function showEndScreen() {
-            // Close mobile chat if open
-            document.getElementById('chat-area-container').classList.remove('open');
+            setMobileChatState(false);
             
             const endScreen = document.getElementById('end-screen');
             endScreen.style.display = 'flex';
@@ -1004,4 +999,5 @@
     </script>
 </body>
 </html>
+
 
