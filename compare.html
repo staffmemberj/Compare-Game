@@ -324,7 +324,7 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             gap: 3vw;
             padding-bottom: 10vh;
         }
@@ -595,16 +595,8 @@
 
             #cards-container {
                 gap: 4vw;
-                align-items: flex-start;
                 padding-bottom: 18vh;
             }
-
-            .item-card {
-                width: 42%;
-                padding: 1.5vh 2vw;
-            }
-            .card-emoji { font-size: 6vh; }
-            .card-name { font-size: 2vh; }
         }
 
         .close-chat-btn { display: none; }
@@ -1075,9 +1067,51 @@
             });
         }
 
+        /* --- Auto Insert Logic --- */
+        function autoInsertCardWords(item) {
+            const interactionArea = document.getElementById('interaction-area');
+            // Don't auto-insert if the user isn't able to construct a sentence yet
+            if (interactionArea.classList.contains('hidden')) return;
+
+            const builder = document.getElementById('sentence-builder');
+            const bank = document.getElementById('word-bank');
+
+            // Find the item's name tile in the bank (strip punctuation just in case)
+            const nameTile = Array.from(bank.children).find(t => {
+                let cleanText = t.innerText.replace(/[.,!?]/g, '');
+                return cleanText.toLowerCase() === item.name.toLowerCase();
+            });
+
+            if (nameTile) {
+                // Determine if we need to insert an article first
+                const isFirstWord = builder.children.length === 0;
+
+                if (isFirstWord) {
+                    // Try to insert an uppercase "The"
+                    const uppercaseThe = Array.from(bank.children).find(t => t.innerText === "The");
+                    if (uppercaseThe) moveToSentence(uppercaseThe);
+                } else {
+                    // Make sure we aren't doubling up on "the"
+                    const lastWord = builder.lastElementChild ? builder.lastElementChild.innerText : "";
+                    if (lastWord.toLowerCase() !== "the") {
+                        // Try to insert a lowercase "the"
+                        const lowercaseThe = Array.from(bank.children).find(t => t.innerText === "the");
+                        if (lowercaseThe) moveToSentence(lowercaseThe);
+                    }
+                }
+                
+                // Finally, insert the item name itself
+                moveToSentence(nameTile);
+            }
+        }
+
         /* --- Zoom Modal Logic --- */
         function openCardZoom(item, statConfig) {
             playSound('tap');
+            
+            // Auto insert text based on the card tapped
+            autoInsertCardWords(item);
+
             const modal = document.getElementById('card-zoom-modal');
             const content = document.getElementById('zoomed-card-content');
             
@@ -1261,6 +1295,5 @@
     </script>
 </body>
 </html>
-
 
 
