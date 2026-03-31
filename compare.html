@@ -51,8 +51,8 @@
         }
 
         #chat-area-container {
-            width: 450px;
-            max-width: 40vw;
+            flex: 0 0 auto; /* Wraps tightly around the phone */
+            height: 100%; /* Ensures container takes full screen height */
             padding: 2vh 2vw 2vh 0;
             display: flex;
             align-items: center;
@@ -63,8 +63,9 @@
 
         /* --- Smartphone Mockup for Desktop --- */
         #chat-app {
-            width: 100%;
-            height: 100%;
+            /* Spans the full height of the container minus the 2vh top/bottom padding */
+            height: 100%; 
+            aspect-ratio: 9 / 19; /* Made narrower for a modern phone look */
             background: #f8f9fa;
             border-radius: 40px;
             border: 10px solid #2f3542;
@@ -325,9 +326,10 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            align-items: flex-start;
-            gap: 3vw;
-            padding-bottom: 10vh;
+            align-items: center;
+            align-content: center;
+            gap: 3vh 3vw;
+            padding-bottom: 0; /* Removed padding to prevent forced scrolling */
         }
 
         .item-card {
@@ -338,9 +340,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             padding: 2vh 2vw;
-            margin-bottom: 15px;
-            width: clamp(150px, 20vw, 250px);
+            
+            /* Fill space while maintaining card look */
+            flex: 1 1 30%; 
+            max-width: 350px;
+            min-width: 220px;
+            height: 38vh; /* Fixed height relative to screen to avoid scrolling */
+            
             transition: all 0.3s var(--bounce);
             animation: popIn 0.5s var(--bounce) forwards;
             opacity: 0;
@@ -359,13 +367,14 @@
         }
 
         .card-emoji {
-            font-size: 8vh;
+            font-size: 10vh;
             line-height: 1;
-            margin-bottom: 1vh;
+            margin-bottom: auto; /* Pushes succeeding elements down */
+            margin-top: 1vh;
         }
 
         .card-name {
-            font-size: 2.5vh;
+            font-size: 3vh;
             font-weight: bold;
             text-transform: capitalize;
             color: var(--main-teal);
@@ -377,15 +386,16 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            gap: 1vh;
+            gap: 1.5vh;
+            margin-top: auto; /* Pushes stats to bottom of the card */
         }
 
         .stat-pill {
             background: #f1f2f6;
             color: #2f3542;
-            padding: 1vh;
+            padding: 1.5vh;
             border-radius: 12px;
-            font-size: 1.6vh;
+            font-size: 2vh;
             font-weight: 600;
             text-align: center;
             display: flex;
@@ -393,10 +403,10 @@
         }
         
         .stat-label {
-            font-size: 1.2vh;
+            font-size: 1.4vh;
             color: #747d8c;
             text-transform: uppercase;
-            margin-bottom: 0.2vh;
+            margin-bottom: 0.4vh;
         }
 
         /* --- Modals & Screens --- */
@@ -567,6 +577,7 @@
                 transform: translateY(calc(100% - 8vh));
                 transition: transform 0.4s var(--bounce);
                 z-index: 150;
+                display: block; /* Fix: Forces container to ignore shrink-to-fit flex rules */
             }
 
             #chat-area-container.open {
@@ -574,6 +585,9 @@
             }
 
             #chat-app {
+                width: 100%;
+                height: 100%; /* Overrides the min() height */
+                aspect-ratio: auto; /* Overrides the 10/16 ratio to fit screen */
                 border-radius: 25px 25px 0 0;
                 border: none;
                 box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
@@ -613,13 +627,24 @@
 
             #cards-container {
                 gap: 4vw;
+                align-items: flex-start;
+                align-content: flex-start;
                 padding-bottom: 18vh;
             }
 
             .item-card {
+                flex: none; /* Override desktop dynamic sizing */
                 width: 42%;
+                height: auto;
+                min-height: 25vh; /* Restore mobile wrap logic */
                 padding: 1.5vh 2vw;
+                justify-content: flex-start;
             }
+            .card-emoji { font-size: 6vh; margin-bottom: 1vh; margin-top: 0; }
+            .card-name { font-size: 2vh; margin-bottom: 1.5vh; }
+            .card-stats { gap: 1vh; margin-top: 0; }
+            .stat-pill { font-size: 1.5vh; padding: 1vh; }
+            .stat-label { font-size: 1.1vh; margin-bottom: 0.2vh; }
 
             /* Maintain card proportions on Mobile Zoomed View */
             .zoomed-card {
@@ -810,9 +835,42 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function playSound(type) {
-            // Mocked audio for iframe safety
+        /* --- Audio Configuration --- */
+        const soundMap = {
+            tap: 'sounds/typing.mp3',
+            send: 'sounds/send.mp3',
+            pop: 'sounds/chat.mp3',
+            correct: 'sounds/victory.mp3',
+            wrong: 'sounds/wrong.mp3',
+            tada: 'sounds/victory.mp3',
+            hover: 'sounds/hover.mp3'
+        };
+
+        const audioObjects = {};
+        for (let key in soundMap) {
+            audioObjects[key] = new Audio(soundMap[key]);
         }
+
+        function playSound(type) {
+            if (audioObjects[type]) {
+                // Clone the node so rapid clicking (like typing) overlaps correctly
+                const soundNode = audioObjects[type].cloneNode();
+                soundNode.volume = 0.5; // Soften volume slightly
+                soundNode.play().catch(e => console.log("Audio play prevented until user interacts."));
+            }
+        }
+
+        /* Add Card Hover Sounds */
+        let lastHoveredElement = null;
+        document.addEventListener('mouseover', function(e) {
+            const hoverable = e.target.closest('.item-card');
+            if (hoverable && hoverable !== lastHoveredElement) { 
+                playSound('hover'); 
+                lastHoveredElement = hoverable; 
+            } else if (!hoverable) { 
+                lastHoveredElement = null; 
+            }
+        });
 
         /* --- Chat Text Formatting (Highlights Adjectives) --- */
         function formatChatText(text) {
@@ -908,6 +966,12 @@
             const bubble = document.createElement('div');
             bubble.className = `bubble ${className}`;
             bubble.innerHTML = formatChatText(text);
+            
+            // Play 'pop' for all bot/system bubbles
+            if (className !== "user-bubble" && className !== "typing-indicator") {
+                playSound('pop');
+            }
+            
             chat.appendChild(bubble);
             scrollToBottom();
         }
@@ -920,6 +984,7 @@
             typingDiv.id = 'typing-indicator';
             typingDiv.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
             
+            playSound('pop'); // Play 'pop' when the indicator first appears
             chat.appendChild(typingDiv);
             scrollToBottom();
 
@@ -1243,6 +1308,7 @@
 
             if (isCorrect) {
                 showTypingIndicator(() => {
+                    playSound('correct');
                     addBubble("Excellent! Spot on. 🌟", "bot-bubble");
                     
                     setTimeout(() => {
@@ -1256,6 +1322,7 @@
                 }, 800);
             } else {
                 showTypingIndicator(() => {
+                    playSound('wrong');
                     let hint = "Not quite.";
                     if (!userSentence.startsWith("The")) {
                         hint += " Remember to start with 'The'.";
