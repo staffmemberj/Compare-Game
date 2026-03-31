@@ -92,7 +92,7 @@
         #chat-header {
             background: var(--main-teal);
             color: white;
-            padding: 3.5vh 1.5vw 1.5vh 1.5vw; /* Extra top padding for notch */
+            padding: 3.5vh 1.5vw 1.5vh 1.5vw;
             text-align: center;
             font-size: 2.2vh;
             font-weight: 700;
@@ -103,7 +103,7 @@
 
         #chat-window {
             flex: 1;
-            padding: 2vh 1.5vw 6vh 1.5vw; /* Extra bottom padding so bubbles aren't cut off */
+            padding: 2vh 1.5vw 6vh 1.5vw;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -116,7 +116,7 @@
             padding: 1.5vh 1.5vw;
             border-radius: 20px;
             font-size: 2vh;
-            line-height: 1.4;
+            line-height: 1.5;
             animation: popIn 0.4s var(--bounce) forwards;
             box-shadow: 0 4px 0 rgba(0,0,0,0.05);
             opacity: 0;
@@ -147,6 +147,35 @@
             border: 2px dashed #ced6e0;
             text-align: center;
             box-shadow: none;
+        }
+
+        /* --- Highlights for Adjectives --- */
+        .highlight-adj {
+            background-color: #ffeaa7;
+            color: #d63031;
+            padding: 0.2vh 0.8vw;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            border-bottom: 2px solid #fdcb6e;
+            transition: all 0.2s;
+            display: inline-block;
+            margin: 0 0.2vw;
+        }
+        
+        .highlight-adj:hover {
+            transform: scale(1.05);
+            background-color: #fdcb6e;
+        }
+
+        .highlight-adj:active {
+            transform: scale(0.95);
+        }
+
+        .user-bubble .highlight-adj {
+            background-color: #f1c40f;
+            color: #2f3542;
+            border-bottom: 2px solid #f39c12;
         }
 
         .typing-indicator {
@@ -368,7 +397,7 @@
             margin-bottom: 0.2vh;
         }
 
-        /* --- Start & End Screens --- */
+        /* --- Modals & Screens --- */
         .overlay-screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -416,7 +445,6 @@
             box-shadow: 0 0 0 #218c53;
         }
 
-        /* --- Modal Backdrop for Zoom --- */
         .modal-backdrop {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -438,7 +466,7 @@
         }
         
         .zoomed-card:hover, .zoomed-card:active {
-            transform: scale(1) translateY(0); /* Override standard hover */
+            transform: scale(1) translateY(0);
             box-shadow: 0 8px 0 var(--card-shadow);
             border-color: var(--card-border);
         }
@@ -447,6 +475,59 @@
         .zoomed-card .card-name { font-size: 4vh; margin-bottom: 3vh; }
         .zoomed-card .stat-pill { font-size: 2.2vh; padding: 1.5vh; margin-bottom: 1vh; }
         .zoomed-card .stat-label { font-size: 1.5vh; margin-bottom: 0.5vh; }
+
+        /* --- Grammar Modal Specific --- */
+        .grammar-card {
+            background: white;
+            border-radius: 25px;
+            width: 85vw;
+            max-width: 400px;
+            padding: 0;
+            overflow: hidden;
+            animation: popInZoom 0.4s var(--bounce) forwards;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 4px solid var(--main-teal);
+        }
+
+        .grammar-header {
+            background: var(--main-teal);
+            color: white;
+            padding: 2.5vh;
+            text-align: center;
+            font-size: 3.5vh;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .grammar-body {
+            padding: 3vh 2vw;
+            text-align: center;
+        }
+
+        .grammar-translation {
+            font-size: 3vh;
+            font-weight: 700;
+            color: #d63031;
+            margin-bottom: 2vh;
+        }
+
+        .grammar-rule-box {
+            background: #f1f2f6;
+            border-left: 5px solid #ffa502;
+            padding: 2vh;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 2.2vh;
+            color: #2f3542;
+            line-height: 1.5;
+        }
+
+        .grammar-rule-title {
+            font-weight: bold;
+            color: #ffa502;
+            margin-bottom: 1vh;
+            font-size: 2.5vh;
+        }
 
         @keyframes popInZoom {
             0% { transform: scale(0.5); opacity: 0; }
@@ -464,7 +545,6 @@
                 height: 85vh;
                 padding: 0;
                 background: transparent;
-                /* Peek out exactly 8vh */
                 transform: translateY(calc(100% - 8vh));
                 transition: transform 0.4s var(--bounce);
                 z-index: 150;
@@ -491,7 +571,7 @@
                 justify-content: center;
                 align-items: center;
                 position: relative;
-                cursor: pointer; /* Makes the whole header clickable */
+                cursor: pointer;
             }
 
             .close-chat-btn {
@@ -508,18 +588,18 @@
                 height: 4vh;
                 border-radius: 10px;
                 font-family: inherit;
-                pointer-events: none; /* Let the header block receive clicks */
+                pointer-events: none;
                 font-size: 2vh;
             }
 
             #cards-container {
                 gap: 4vw;
                 align-items: flex-start;
-                padding-bottom: 12vh; /* Give space for peeking chat window */
+                padding-bottom: 12vh;
             }
 
             .item-card {
-                width: 42%; /* Two per row mostly */
+                width: 42%;
                 padding: 1.5vh 2vw;
             }
             .card-emoji { font-size: 6vh; }
@@ -549,6 +629,20 @@
     <div id="card-zoom-modal" class="modal-backdrop" style="display: none;" onclick="closeCardZoom()">
         <div id="zoomed-card-content" class="item-card zoomed-card" onclick="event.stopPropagation()">
             <!-- Injected via JS -->
+        </div>
+    </div>
+
+    <!-- Grammar Modal -->
+    <div id="grammar-modal" class="modal-backdrop" style="display: none; z-index: 700;" onclick="closeGrammarModal()">
+        <div class="grammar-card" onclick="event.stopPropagation()">
+            <div class="grammar-header" id="grammar-word-title">Word</div>
+            <div class="grammar-body">
+                <div class="grammar-translation" id="grammar-translation-text">日本語訳</div>
+                <div class="grammar-rule-box">
+                    <div class="grammar-rule-title" id="grammar-rule-title">Rule</div>
+                    <div id="grammar-rule-desc">Rule description</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -594,7 +688,7 @@
     </div>
 
     <script>
-        /* --- Game Data --- */
+        /* --- Game & Grammar Data --- */
         const gameData = {
             animals: {
                 name: "Animals",
@@ -644,6 +738,40 @@
             }
         };
 
+        const grammarDictionary = {
+            "heavier": { ja: "より重い (heavy)", type: "er" },
+            "lighter": { ja: "より軽い (light)", type: "er" },
+            "the heaviest": { ja: "一番重い (heavy)", type: "est" },
+            "the lightest": { ja: "一番軽い (light)", type: "est" },
+            "faster": { ja: "より速い (fast)", type: "er" },
+            "slower": { ja: "より遅い (slow)", type: "er" },
+            "the fastest": { ja: "一番速い (fast)", type: "est" },
+            "the slowest": { ja: "一番遅い (slow)", type: "est" },
+            "more expensive": { ja: "より値段が高い (expensive)", type: "more" },
+            "cheaper": { ja: "より安い (cheap)", type: "er" },
+            "the most expensive": { ja: "一番値段が高い (expensive)", type: "most" },
+            "the cheapest": { ja: "一番安い (cheap)", type: "est" }
+        };
+
+        const ruleDescriptions = {
+            "er": {
+                title: "-er の使い方",
+                desc: "短い単語の最後に <b>-er</b> をつけて、「より〜」という意味にします。<br><br><small>例: fast → fast<b>er</b></small>"
+            },
+            "est": {
+                title: "-est の使い方",
+                desc: "短い単語の最後に <b>-est</b> をつけて、「一番〜」という意味にします。言葉の前に <b>the</b> が必要です。<br><br><small>例: fast → <b>the</b> fast<b>est</b></small>"
+            },
+            "more": {
+                title: "more の使い方",
+                desc: "長い単語の前に <b>more</b> をおいて、「より〜」という意味にします。<br><br><small>例: expensive → <b>more</b> expensive</small>"
+            },
+            "most": {
+                title: "most の使い方",
+                desc: "長い単語の前に <b>most</b> をおいて、「一番〜」という意味にします。言葉の前に <b>the</b> が必要です。<br><br><small>例: expensive → <b>the most</b> expensive</small>"
+            }
+        };
+
         /* --- State Variables --- */
         let currentRound = 1;
         const maxRounds = 5;
@@ -663,19 +791,66 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function capitalize(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
+        function playSound(type) {
+            // Mocked audio for iframe safety
         }
 
-        /* --- Audio (Mocked for safety) --- */
-        function playSound(type) {
-            // In a real environment, we would trigger Audio objects.
-            // Keeping silent to ensure it works flawlessly in iframe.
+        /* --- Chat Text Formatting (Highlights Adjectives) --- */
+        function formatChatText(text) {
+            // Sort keys by length to avoid matching partial phrases (e.g. "expensive" inside "more expensive")
+            const keys = Object.keys(grammarDictionary).sort((a, b) => b.length - a.length);
+            let tempText = text;
+            let replacements = [];
+
+            // 1. Temporarily replace matches with placeholders so we don't accidentally nest HTML
+            keys.forEach((key) => {
+                const regex = new RegExp(`\\b${key}\\b`, 'gi'); // Case-insensitive
+                tempText = tempText.replace(regex, (match) => {
+                    replacements.push({ match: match, key: key });
+                    return `__PLACEHOLDER_${replacements.length - 1}__`;
+                });
+            });
+
+            // 2. Replace placeholders with styled, clickable span tags
+            replacements.forEach((rep, index) => {
+                const htmlTag = `<span class="highlight-adj" onclick="openGrammarModal('${rep.key}', event)">${rep.match}</span>`;
+                tempText = tempText.replace(`__PLACEHOLDER_${index}__`, htmlTag);
+            });
+
+            return tempText;
+        }
+
+        /* --- Grammar Modal Logic --- */
+        function openGrammarModal(key, event) {
+            if(event) event.stopPropagation(); // Prevent parent clicks from firing
+            playSound('tap');
+            
+            const data = grammarDictionary[key.toLowerCase()];
+            if(!data) return;
+
+            const ruleData = ruleDescriptions[data.type];
+
+            document.getElementById('grammar-word-title').innerText = capitalize(key);
+            document.getElementById('grammar-translation-text').innerText = data.ja;
+            document.getElementById('grammar-rule-title').innerHTML = ruleData.title;
+            document.getElementById('grammar-rule-desc').innerHTML = ruleData.desc;
+
+            const modal = document.getElementById('grammar-modal');
+            modal.style.display = 'flex';
+            void modal.offsetWidth; // Trigger reflow
+            modal.style.opacity = '1';
+        }
+
+        function closeGrammarModal() {
+            playSound('tap');
+            const modal = document.getElementById('grammar-modal');
+            modal.style.opacity = '0';
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
         }
 
         /* --- UI Controls --- */
         function setMobileChatState(isOpen) {
-            if (window.innerWidth > 850) return; // Desktop is always visible
+            if (window.innerWidth > 850) return;
             const chatContainer = document.getElementById('chat-area-container');
             const btn = document.querySelector('.close-chat-btn');
             
@@ -689,7 +864,7 @@
         }
 
         function toggleMobileChat() {
-            if (window.innerWidth > 850) return; // Ignore clicks on desktop
+            if (window.innerWidth > 850) return;
             playSound('tap');
             const chatContainer = document.getElementById('chat-area-container');
             setMobileChatState(!chatContainer.classList.contains('open'));
@@ -716,7 +891,10 @@
             const chat = document.getElementById('chat-window');
             const bubble = document.createElement('div');
             bubble.className = `bubble ${className}`;
-            bubble.innerHTML = text;
+            
+            // Format the text to highlight comparative/superlative adjectives
+            bubble.innerHTML = formatChatText(text);
+            
             chat.appendChild(bubble);
             scrollToBottom();
         }
@@ -788,7 +966,6 @@
                 item.currentStats = {};
                 statKeys.forEach(stat => {
                     let val;
-                    // Ensure target stat is strictly unique so there are no ties
                     if (stat === targetStat) {
                         do {
                             val = randomInt(item.stats[stat][0], item.stats[stat][1]);
@@ -832,22 +1009,19 @@
             let correctWords = baseSentence.split(" ");
             let distractors = [];
             
-            // Add logical distractors
             if (numItems === 2) {
                 distractors.push(loser.name);
                 distractors.push(isHigh ? adjConfig.low : adjConfig.high);
-                distractors.push(isHigh ? adjConfig.highest : adjConfig.lowest); // throw in superlative
+                distractors.push(isHigh ? adjConfig.highest : adjConfig.lowest);
                 if (adjConfig.high.includes("more")) distractors.push("most");
             } else {
-                distractors.push(selectedItems[1].name); // random loser
+                distractors.push(selectedItems[1].name);
                 distractors.push(isHigh ? adjConfig.lowest : adjConfig.highest);
-                distractors.push(isHigh ? adjConfig.high : adjConfig.low); // throw in comparative
+                distractors.push(isHigh ? adjConfig.high : adjConfig.low);
                 distractors.push("than");
             }
 
-            // Cleanup punctuation from distractors just in case
             distractors = distractors.filter(d => !correctWords.includes(d));
-
             let fullBank = [...correctWords, ...distractors.slice(0, 4)];
             fullBank = shuffleArray(fullBank);
 
@@ -856,11 +1030,7 @@
                 if (currentRound === 1) addBubble("Let's begin! Check the data on the left.", "sys-bubble");
                 addBubble(question, "bot-bubble");
                 
-                // Pop open the mobile chat automatically on round start to prompt user
-                setTimeout(() => {
-                    setMobileChatState(true);
-                }, 500);
-
+                setTimeout(() => { setMobileChatState(true); }, 500);
                 setTimeout(() => {
                     renderWordBank(fullBank);
                     showInteraction();
@@ -877,12 +1047,10 @@
                 card.className = 'item-card';
                 card.style.animationDelay = `${index * 0.1}s`;
 
-                // Add click listener to open the zoomed version
                 card.onclick = () => openCardZoom(item, statConfig);
 
                 let statsHtml = '';
                 for (let stat in statConfig) {
-                    // Format number with commas (e.g., 50000 -> 50,000)
                     let formattedVal = Number(item.currentStats[stat]).toLocaleString('en-US');
                     if (statConfig[stat].label.includes("$")) formattedVal = "$" + formattedVal;
                     
@@ -929,7 +1097,6 @@
             `;
             
             modal.style.display = 'flex';
-            // Trigger reflow to restart transition
             void modal.offsetWidth;
             modal.style.opacity = '1';
         }
@@ -938,9 +1105,11 @@
             playSound('tap');
             const modal = document.getElementById('card-zoom-modal');
             modal.style.opacity = '0';
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
         }
 
         /* --- Sentence Builder Logic --- */
@@ -1015,7 +1184,6 @@
             addBubble(userSentence, "user-bubble");
             hideInteraction();
 
-            // Strict matching
             const isCorrect = currentValidAnswers.includes(userSentence);
 
             if (isCorrect) {
@@ -1032,9 +1200,7 @@
                     }, 2000);
                 }, 800);
             } else {
-                // Incorrect logic
                 showTypingIndicator(() => {
-                    // Provide a small hint checking for basic structure
                     let hint = "Not quite.";
                     if (!userSentence.startsWith("The")) {
                         hint += " Remember to start with 'The'.";
@@ -1053,7 +1219,6 @@
         }
 
         function processIncorrectTiles(tiles) {
-            // Send incorrect tiles back to the bank
             const validAnswer = currentValidAnswers[0];
             let builtString = "";
             let maxMatch = 0;
@@ -1092,6 +1257,5 @@
     </script>
 </body>
 </html>
-
 
 
