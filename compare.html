@@ -15,6 +15,7 @@
             --bot-bg: #ffffff;
             --user-bg: #1e90ff;
             --bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --phone-ratio: 9 / 16; /* Fallback ratio */
         }
 
         body {
@@ -65,7 +66,7 @@
         #chat-app {
             /* Spans the full height of the container minus the 2vh top/bottom padding */
             height: 100%; 
-            aspect-ratio: 9 / 19; /* Made narrower for a modern phone look */
+            aspect-ratio: var(--phone-ratio); /* Matches the inverse of the user's screen */
             background: #f8f9fa;
             border-radius: 40px;
             border: 10px solid #2f3542;
@@ -469,48 +470,12 @@
             transition: opacity 0.3s;
         }
 
-        .zoomed-card {
-            width: 80vw;
-            max-width: 350px;
-            padding: 4vh 4vw;
-            animation: popInZoom 0.4s var(--bounce) forwards;
-            cursor: default;
-        }
-        
-        .zoomed-card:hover, .zoomed-card:active {
-            transform: scale(1) translateY(0);
-            box-shadow: 0 8px 0 var(--card-shadow);
-            border-color: var(--card-border);
-        }
-        
-        .zoomed-card .card-emoji { font-size: 15vh; margin-bottom: 2vh; }
-        .zoomed-card .card-name { font-size: 4vh; margin-bottom: 3vh; }
-        .zoomed-card .stat-pill { font-size: 2.2vh; padding: 1.5vh; margin-bottom: 1vh; }
-        .zoomed-card .stat-label { font-size: 1.5vh; margin-bottom: 0.5vh; }
-
-        /* Clickable elements in zoom view */
-        .clickable-zoom-element {
-            cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-            border-radius: 15px;
-            padding: 0.5vh 1vw;
-            display: inline-block;
-        }
-        .clickable-zoom-element:hover {
-            transform: scale(1.1);
-            background-color: #f1f2f6;
-        }
-        .clickable-zoom-element:active {
-            transform: scale(0.95);
-            background-color: #dfe4ea;
-        }
-
         /* --- Grammar Modal Specific --- */
         .grammar-card {
             background: white;
             border-radius: 25px;
             width: 85vw;
-            max-width: 400px;
+            max-width: 550px; /* Increased from 400px to make it wider on desktop */
             padding: 0;
             overflow: hidden;
             animation: popInZoom 0.4s var(--bounce) forwards;
@@ -521,41 +486,41 @@
         .grammar-header {
             background: var(--main-teal);
             color: white;
-            padding: 2.5vh;
+            padding: 3vh; /* Slightly more padding */
             text-align: center;
-            font-size: 3.5vh;
+            font-size: 4vh; /* Increased font size */
             font-weight: bold;
             letter-spacing: 1px;
         }
 
         .grammar-body {
-            padding: 3vh 2vw;
+            padding: 4vh 3vw; /* More breathing room */
             text-align: center;
         }
 
         .grammar-translation {
-            font-size: 3vh;
+            font-size: 3.5vh; /* Increased font size */
             font-weight: 700;
             color: #d63031;
-            margin-bottom: 2vh;
+            margin-bottom: 2.5vh;
         }
 
         .grammar-rule-box {
             background: #f1f2f6;
             border-left: 5px solid #ffa502;
-            padding: 2vh;
+            padding: 2.5vh;
             border-radius: 8px;
             text-align: left;
-            font-size: 2.2vh;
+            font-size: 2.4vh; /* Increased font size */
             color: #2f3542;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .grammar-rule-title {
             font-weight: bold;
             color: #ffa502;
-            margin-bottom: 1vh;
-            font-size: 2.5vh;
+            margin-bottom: 1.5vh;
+            font-size: 2.8vh; /* Increased font size */
         }
 
         @keyframes popInZoom {
@@ -645,18 +610,6 @@
             .card-stats { gap: 1vh; margin-top: 0; }
             .stat-pill { font-size: 1.5vh; padding: 1vh; }
             .stat-label { font-size: 1.1vh; margin-bottom: 0.2vh; }
-
-            /* Maintain card proportions on Mobile Zoomed View */
-            .zoomed-card {
-                width: 65vw; 
-                padding: 2.5vh 3vw;
-                border-radius: 20px;
-                max-width: none;
-            }
-            .zoomed-card .card-emoji { font-size: 10vh; margin-bottom: 1vh; }
-            .zoomed-card .card-name { font-size: 3.5vh; margin-bottom: 2vh; }
-            .zoomed-card .stat-pill { font-size: 1.8vh; padding: 1.2vh; margin-bottom: 0.8vh; }
-            .zoomed-card .stat-label { font-size: 1.2vh; margin-bottom: 0.2vh; }
         }
 
         .close-chat-btn { display: none; }
@@ -676,11 +629,7 @@
         <button class="btn" style="background: #1e90ff; border-color: #0984e3; box-shadow: 0 6px 0 #0984e3;" onclick="resetGame()">Play Again 🔄</button>
     </div>
 
-    <div id="card-zoom-modal" class="modal-backdrop" style="display: none;" onclick="closeCardZoom()">
-        <div id="zoomed-card-content" class="item-card zoomed-card" onclick="event.stopPropagation()">
-            </div>
-    </div>
-
+    <!-- Grammar Modal -->
     <div id="grammar-modal" class="modal-backdrop" style="display: none; z-index: 700;" onclick="closeGrammarModal()">
         <div class="grammar-card" onclick="event.stopPropagation()">
             <div class="grammar-header" id="grammar-word-title">Word</div>
@@ -732,6 +681,24 @@
     </div>
 
     <script>
+        /* --- Dynamic Phone Aspect Ratio --- */
+        function updatePhoneRatio() {
+            if (window.innerWidth > 850) {
+                // Read the active window dimensions instead of physical screen dimensions
+                const windowW = window.innerWidth;
+                const windowH = window.innerHeight;
+                
+                // Ensure we get the portrait representation (smaller / larger) 
+                // This makes the phone look like the user's window turned sideways
+                const portraitW = Math.min(windowW, windowH);
+                const portraitH = Math.max(windowW, windowH);
+                
+                document.documentElement.style.setProperty('--phone-ratio', `${portraitW} / ${portraitH}`);
+            }
+        }
+        window.addEventListener('resize', updatePhoneRatio);
+        updatePhoneRatio(); // Trigger on load
+
         /* --- Game & Grammar Data --- */
         const gameData = {
             animals: {
@@ -1084,20 +1051,22 @@
             let correctWords = baseSentence.split(" ");
             let distractors = [];
             
+            // Ensure ALL cards have their names in the word bank
+            selectedItems.forEach(item => distractors.push(item.name));
+
             if (numItems === 2) {
-                distractors.push(loser.name);
                 distractors.push(isHigh ? adjConfig.low : adjConfig.high);
                 distractors.push(isHigh ? adjConfig.highest : adjConfig.lowest);
                 if (adjConfig.high.includes("more")) distractors.push("most");
             } else {
-                distractors.push(selectedItems[1].name);
                 distractors.push(isHigh ? adjConfig.lowest : adjConfig.highest);
                 distractors.push(isHigh ? adjConfig.high : adjConfig.low);
                 distractors.push("than");
             }
 
             distractors = distractors.filter(d => !correctWords.includes(d));
-            let fullBank = [...correctWords, ...distractors.slice(0, 4)];
+            let fullBank = [...correctWords, ...distractors];
+            fullBank = [...new Set(fullBank)]; // Remove duplicates
             fullBank = shuffleArray(fullBank);
 
             showTypingIndicator(() => {
@@ -1124,7 +1093,7 @@
                 card.className = 'item-card';
                 card.style.animationDelay = `${index * 0.1}s`;
 
-                card.onclick = () => openCardZoom(item, statConfig);
+                card.onclick = () => handleCardClick(item);
 
                 let statsHtml = '';
                 for (let stat in statConfig) {
@@ -1148,85 +1117,75 @@
             });
         }
 
-        /* --- Auto Insert Logic --- */
-        function autoInsertCardWords(itemName) {
+        /* --- Card Click & Auto Insert Logic --- */
+        window.handleCardClick = function(item) {
+            playSound('tap');
+            if (window.innerWidth <= 850) {
+                setMobileChatState(true);
+                // Wait for the chat to slide up before typing
+                setTimeout(() => {
+                    animateCardWordsInsertion(item.name);
+                }, 400); 
+            } else {
+                animateCardWordsInsertion(item.name);
+            }
+        };
+
+        function animateCardWordsInsertion(itemName) {
             const interactionArea = document.getElementById('interaction-area');
             if (interactionArea.classList.contains('hidden')) return;
 
             const builder = document.getElementById('sentence-builder');
             const bank = document.getElementById('word-bank');
 
-            const nameTile = Array.from(bank.children).find(t => {
+            // Look for the tile in both the bank and the builder
+            const allTiles = [...Array.from(bank.children), ...Array.from(builder.children)];
+            let nameTile = allTiles.find(t => {
                 let cleanText = t.innerText.replace(/[.,!?]/g, '');
                 return cleanText.toLowerCase() === itemName.toLowerCase();
             });
 
-            if (nameTile) {
-                const isFirstWord = builder.children.length === 0;
+            // Fallback: If for some reason the tile doesn't exist, create it in the bank
+            if (!nameTile) {
+                nameTile = document.createElement('div');
+                nameTile.className = 'word-tile';
+                nameTile.innerText = itemName;
+                nameTile.onclick = () => moveToSentence(nameTile);
+                bank.appendChild(nameTile);
+            }
 
+            let tilesToMove = [];
+            
+            // Only auto-add articles if the noun tile is coming from the word bank (newly added)
+            if (nameTile.parentElement === bank) {
+                const isFirstWord = builder.children.length === 0;
                 if (isFirstWord) {
                     const uppercaseThe = Array.from(bank.children).find(t => t.innerText === "The");
-                    if (uppercaseThe) moveToSentence(uppercaseThe);
+                    if (uppercaseThe) tilesToMove.push(uppercaseThe);
                 } else {
                     const lastWord = builder.lastElementChild ? builder.lastElementChild.innerText : "";
                     if (lastWord.toLowerCase() !== "the") {
                         const lowercaseThe = Array.from(bank.children).find(t => t.innerText === "the");
-                        if (lowercaseThe) moveToSentence(lowercaseThe);
+                        if (lowercaseThe) tilesToMove.push(lowercaseThe);
                     }
                 }
-                moveToSentence(nameTile);
             }
-        }
-
-        window.insertAndCloseZoom = function(itemName) {
-            playSound('tap');
-            autoInsertCardWords(itemName);
-            closeCardZoom();
             
-            if (window.innerWidth <= 850) {
+            tilesToMove.push(nameTile);
+
+            // Type out the tiles with a sequential animation
+            tilesToMove.forEach((tile, index) => {
                 setTimeout(() => {
-                    setMobileChatState(true);
-                }, 350); 
-            }
-        };
-
-        /* --- Zoom Modal Logic --- */
-        window.openCardZoom = function(item, statConfig) {
-            playSound('tap');
-            
-            const modal = document.getElementById('card-zoom-modal');
-            const content = document.getElementById('zoomed-card-content');
-            
-            let statsHtml = '';
-            for (let stat in statConfig) {
-                let formattedVal = Number(item.currentStats[stat]).toLocaleString('en-US');
-                if (statConfig[stat].label.includes("$")) formattedVal = "$" + formattedVal;
-                
-                statsHtml += `
-                    <div class="stat-pill">
-                        <span class="stat-label">${statConfig[stat].label}</span>
-                        <span>${formattedVal}</span>
-                    </div>
-                `;
-            }
-
-            content.innerHTML = `
-                <div class="card-emoji clickable-zoom-element" onclick="insertAndCloseZoom('${item.name}')">${item.emoji}</div>
-                <div class="card-name clickable-zoom-element" onclick="insertAndCloseZoom('${item.name}')">${item.name}</div>
-                <div class="card-stats">${statsHtml}</div>
-            `;
-            
-            modal.style.display = 'flex';
-            void modal.offsetWidth;
-            modal.style.opacity = '1';
-        };
-
-        window.closeCardZoom = function() {
-            playSound('tap');
-            const modal = document.getElementById('card-zoom-modal');
-            modal.style.opacity = '0';
-            setTimeout(() => { modal.style.display = 'none'; }, 300);
-        };
+                    if (tile.parentElement === bank) {
+                        moveToSentence(tile);
+                    } else if (tile.parentElement === builder) {
+                        playSound('tap');
+                        builder.appendChild(tile);
+                        scrollToBottom();
+                    }
+                }, index * 150); 
+            });
+        }
 
         function capitalize(str) {
             return str.charAt(0).toUpperCase() + str.slice(1);
