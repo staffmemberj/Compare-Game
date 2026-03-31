@@ -477,6 +477,23 @@
         .zoomed-card .stat-pill { font-size: 2.2vh; padding: 1.5vh; margin-bottom: 1vh; }
         .zoomed-card .stat-label { font-size: 1.5vh; margin-bottom: 0.5vh; }
 
+        /* Clickable elements in zoom view */
+        .clickable-zoom-element {
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            border-radius: 15px;
+            padding: 0.5vh 1vw;
+            display: inline-block;
+        }
+        .clickable-zoom-element:hover {
+            transform: scale(1.1);
+            background-color: #f1f2f6;
+        }
+        .clickable-zoom-element:active {
+            transform: scale(0.95);
+            background-color: #dfe4ea;
+        }
+
         /* --- Grammar Modal Specific --- */
         .grammar-card {
             background: white;
@@ -597,6 +614,22 @@
                 gap: 4vw;
                 padding-bottom: 18vh;
             }
+
+            .item-card {
+                width: 42%;
+                padding: 1.5vh 2vw;
+            }
+
+            /* Maintain card proportions on Mobile Zoomed View */
+            .zoomed-card {
+                width: 65vw; /* Much closer to the portrait card shape */
+                padding: 2.5vh 3vw;
+                border-radius: 20px;
+            }
+            .zoomed-card .card-emoji { font-size: 10vh; margin-bottom: 1vh; }
+            .zoomed-card .card-name { font-size: 3.5vh; margin-bottom: 2vh; }
+            .zoomed-card .stat-pill { font-size: 1.8vh; padding: 1.2vh; margin-bottom: 0.8vh; }
+            .zoomed-card .stat-label { font-size: 1.2vh; margin-bottom: 0.2vh; }
         }
 
         .close-chat-btn { display: none; }
@@ -790,21 +823,18 @@
 
         /* --- Chat Text Formatting (Highlights Adjectives) --- */
         function formatChatText(text) {
-            // Sort keys by length to avoid matching partial phrases (e.g. "expensive" inside "more expensive")
             const keys = Object.keys(grammarDictionary).sort((a, b) => b.length - a.length);
             let tempText = text;
             let replacements = [];
 
-            // 1. Temporarily replace matches with placeholders so we don't accidentally nest HTML
             keys.forEach((key) => {
-                const regex = new RegExp(`\\b${key}\\b`, 'gi'); // Case-insensitive
+                const regex = new RegExp(`\\b${key}\\b`, 'gi');
                 tempText = tempText.replace(regex, (match) => {
                     replacements.push({ match: match, key: key });
                     return `__PLACEHOLDER_${replacements.length - 1}__`;
                 });
             });
 
-            // 2. Replace placeholders with styled, clickable span tags
             replacements.forEach((rep, index) => {
                 const htmlTag = `<span class="highlight-adj" onclick="openGrammarModal('${rep.key}', event)">${rep.match}</span>`;
                 tempText = tempText.replace(`__PLACEHOLDER_${index}__`, htmlTag);
@@ -815,7 +845,7 @@
 
         /* --- Grammar Modal Logic --- */
         function openGrammarModal(key, event) {
-            if(event) event.stopPropagation(); // Prevent parent clicks from firing
+            if(event) event.stopPropagation(); 
             playSound('tap');
             
             const data = grammarDictionary[key.toLowerCase()];
@@ -830,7 +860,7 @@
 
             const modal = document.getElementById('grammar-modal');
             modal.style.display = 'flex';
-            void modal.offsetWidth; // Trigger reflow
+            void modal.offsetWidth;
             modal.style.opacity = '1';
         }
 
@@ -884,10 +914,7 @@
             const chat = document.getElementById('chat-window');
             const bubble = document.createElement('div');
             bubble.className = `bubble ${className}`;
-            
-            // Format the text to highlight comparative/superlative adjectives
             bubble.innerHTML = formatChatText(text);
-            
             chat.appendChild(bubble);
             scrollToBottom();
         }
@@ -942,15 +969,13 @@
             document.getElementById('round-display').innerText = `Round ${currentRound} / ${maxRounds}`;
             hideInteraction();
             
-            // 1. Pick Category & Items
             const categoryKeys = Object.keys(gameData);
             const catKey = categoryKeys[Math.floor(Math.random() * categoryKeys.length)];
             const category = gameData[catKey];
             
-            const numItems = Math.floor(Math.random() * 3) + 2; // 2 to 4 items
+            const numItems = Math.floor(Math.random() * 3) + 2; 
             let selectedItems = shuffleArray([...category.items]).slice(0, numItems);
 
-            // 2. Assign unique stats
             const statKeys = Object.keys(category.statConfig);
             const targetStat = statKeys[Math.floor(Math.random() * statKeys.length)];
             
@@ -971,10 +996,8 @@
                 });
             });
 
-            // 3. Render Cards
             renderCards(selectedItems, category.statConfig);
 
-            // 4. Generate Question and Answer
             selectedItems.sort((a, b) => a.currentStats[targetStat] - b.currentStats[targetStat]);
             const isHigh = Math.random() > 0.5;
             
@@ -998,7 +1021,6 @@
 
             currentValidAnswers = [baseSentence];
 
-            // 5. Generate Word Bank
             let correctWords = baseSentence.split(" ");
             let distractors = [];
             
@@ -1018,7 +1040,6 @@
             let fullBank = [...correctWords, ...distractors.slice(0, 4)];
             fullBank = shuffleArray(fullBank);
 
-            // 6. Bot Interaction
             showTypingIndicator(() => {
                 if (currentRound === 1) {
                     const introMsg = window.innerWidth > 850 ? "Let's begin! Check the data on the left." : "Let's begin! Check the data above.";
@@ -1068,40 +1089,45 @@
         }
 
         /* --- Auto Insert Logic --- */
-        function autoInsertCardWords(item) {
+        function autoInsertCardWords(itemName) {
             const interactionArea = document.getElementById('interaction-area');
-            // Don't auto-insert if the user isn't able to construct a sentence yet
             if (interactionArea.classList.contains('hidden')) return;
 
             const builder = document.getElementById('sentence-builder');
             const bank = document.getElementById('word-bank');
 
-            // Find the item's name tile in the bank (strip punctuation just in case)
             const nameTile = Array.from(bank.children).find(t => {
                 let cleanText = t.innerText.replace(/[.,!?]/g, '');
-                return cleanText.toLowerCase() === item.name.toLowerCase();
+                return cleanText.toLowerCase() === itemName.toLowerCase();
             });
 
             if (nameTile) {
-                // Determine if we need to insert an article first
                 const isFirstWord = builder.children.length === 0;
 
                 if (isFirstWord) {
-                    // Try to insert an uppercase "The"
                     const uppercaseThe = Array.from(bank.children).find(t => t.innerText === "The");
                     if (uppercaseThe) moveToSentence(uppercaseThe);
                 } else {
-                    // Make sure we aren't doubling up on "the"
                     const lastWord = builder.lastElementChild ? builder.lastElementChild.innerText : "";
                     if (lastWord.toLowerCase() !== "the") {
-                        // Try to insert a lowercase "the"
                         const lowercaseThe = Array.from(bank.children).find(t => t.innerText === "the");
                         if (lowercaseThe) moveToSentence(lowercaseThe);
                     }
                 }
-                
-                // Finally, insert the item name itself
                 moveToSentence(nameTile);
+            }
+        }
+
+        function insertAndCloseZoom(itemName) {
+            playSound('tap');
+            autoInsertCardWords(itemName);
+            closeCardZoom();
+            
+            // Pop open chat on mobile to show the sentence change
+            if (window.innerWidth <= 850) {
+                setTimeout(() => {
+                    setMobileChatState(true);
+                }, 350); 
             }
         }
 
@@ -1109,9 +1135,6 @@
         function openCardZoom(item, statConfig) {
             playSound('tap');
             
-            // Auto insert text based on the card tapped
-            autoInsertCardWords(item);
-
             const modal = document.getElementById('card-zoom-modal');
             const content = document.getElementById('zoomed-card-content');
             
@@ -1128,9 +1151,10 @@
                 `;
             }
 
+            // Using onclick with insertAndCloseZoom inside the innerHTML strings
             content.innerHTML = `
-                <div class="card-emoji">${item.emoji}</div>
-                <div class="card-name">${item.name}</div>
+                <div class="card-emoji clickable-zoom-element" onclick="insertAndCloseZoom('${item.name}')">${item.emoji}</div>
+                <div class="card-name clickable-zoom-element" onclick="insertAndCloseZoom('${item.name}')">${item.name}</div>
                 <div class="card-stats">${statsHtml}</div>
             `;
             
