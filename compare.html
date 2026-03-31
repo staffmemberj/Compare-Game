@@ -836,7 +836,6 @@
         }
 
         /* --- Grammar Modal Logic --- */
-        // Attach globally so it never gets lost
         window.openGrammarModal = function(key, event) {
             if(event) event.stopPropagation(); 
             playSound('tap');
@@ -978,9 +977,11 @@
                 statKeys.forEach(stat => {
                     let val;
                     if (stat === targetStat) {
-                        do {
-                            val = randomInt(item.stats[stat][0], item.stats[stat][1]);
-                        } while (usedValues.has(val));
+                        val = randomInt(item.stats[stat][0], item.stats[stat][1]);
+                        // Failsafe to prevent endless loop if stat ranges are too narrow
+                        while (usedValues.has(val)) {
+                            val++;
+                        }
                         usedValues.add(val);
                     } else {
                         val = randomInt(item.stats[stat][0], item.stats[stat][1]);
