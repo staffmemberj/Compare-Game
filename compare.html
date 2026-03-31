@@ -155,14 +155,14 @@
         .highlight-adj {
             background-color: #ffeaa7;
             color: #d63031;
-            padding: 0.2vh 0.8vw;
+            padding: 0.2vh 0.6vw; /* Slightly tweaked padding for visual balance */
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             border-bottom: 2px solid #fdcb6e;
             transition: all 0.2s;
             display: inline-block;
-            margin: 0 0.2vw;
+            margin: 0 0.1vw; /* Reduced margin so punctuation sits naturally close */
         }
         
         .highlight-adj:hover {
@@ -290,6 +290,7 @@
             border: 1px solid #dfe4ea;
             user-select: none;
             transition: all 0.1s;
+            white-space: nowrap; /* Ensures text and punctuation inside the tile never breaks to a new line */
         }
         .word-tile:active { transform: translateY(3px); box-shadow: 0 0px 0 #ced6e0; }
 
@@ -846,15 +847,17 @@
             let replacements = [];
 
             keys.forEach((key) => {
-                const regex = new RegExp(`\\b${key}\\b`, 'gi');
-                tempText = tempText.replace(regex, (match) => {
-                    replacements.push({ match: match, key: key });
+                // Match the key, plus any trailing punctuation to keep them bound together
+                const regex = new RegExp(`\\b(${key})\\b([.,!?]*)`, 'gi');
+                tempText = tempText.replace(regex, (match, p1, p2) => {
+                    replacements.push({ match: p1, key: key, punc: p2 });
                     return `__PLACEHOLDER_${replacements.length - 1}__`;
                 });
             });
 
             replacements.forEach((rep, index) => {
-                const htmlTag = `<span class="highlight-adj" onclick="openGrammarModal('${rep.key}', event)">${rep.match}</span>`;
+                // Wrap both the interactive element AND the punctuation inside a nowrap span
+                const htmlTag = `<span style="white-space: nowrap;"><span class="highlight-adj" onclick="openGrammarModal('${rep.key}', event)">${rep.match}</span>${rep.punc}</span>`;
                 tempText = tempText.replace(`__PLACEHOLDER_${index}__`, htmlTag);
             });
 
