@@ -591,24 +591,32 @@
                 font-size: 2vh;
             }
 
+            #game-header {
+                margin-bottom: 2vh; /* Save vertical space on mobile */
+            }
+
             #cards-container {
-                gap: 4vw;
-                align-items: flex-start;
-                align-content: flex-start;
-                padding-bottom: 18vh;
+                gap: 2vh 4vw;
+                align-items: center;
+                align-content: center;
+                padding-bottom: 10vh; /* Just enough to clear the 8vh phone header */
             }
 
             .item-card {
-                flex: none; /* Override desktop dynamic sizing */
-                width: 42%;
-                height: auto;
-                min-height: 25vh; /* Restore mobile wrap logic */
+                flex: 0 0 44%; /* Exact width to fit 2 per row nicely */
+                width: 44%;
+                height: 36vh; /* Fixed height so 2 rows = 72vh. Fits perfectly without scrolling */
+                min-height: unset;
+                min-width: unset;
+                max-width: unset;
                 padding: 1.5vh 2vw;
-                justify-content: flex-start;
+                justify-content: center; /* Centers content like it used to */
             }
-            .card-emoji { font-size: 6vh; margin-bottom: 1vh; margin-top: 0; }
-            .card-name { font-size: 2vh; margin-bottom: 1.5vh; }
-            .card-stats { gap: 1vh; margin-top: 0; }
+            
+            /* Overriding desktop auto-margins to restore the compact "card" look */
+            .card-emoji { font-size: 6vh; margin: 0 0 1vh 0; }
+            .card-name { font-size: 2.2vh; margin: 0 0 1.5vh 0; }
+            .card-stats { gap: 1vh; margin: 0; }
             .stat-pill { font-size: 1.5vh; padding: 1vh; }
             .stat-label { font-size: 1.1vh; margin-bottom: 0.2vh; }
         }
@@ -1341,3 +1349,16 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
