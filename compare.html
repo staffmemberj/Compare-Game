@@ -15,7 +15,6 @@
             --bot-bg: #ffffff;
             --user-bg: #1e90ff;
             --bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            --phone-ratio: 9 / 16; /* Fallback ratio */
         }
 
         body {
@@ -52,8 +51,8 @@
         }
 
         #chat-area-container {
-            flex: 0 0 auto; /* Wraps tightly around the phone */
-            height: 100%; /* Ensures container takes full screen height */
+            flex: 0 0 auto;
+            height: 100%;
             padding: 2vh 2vw 2vh 0;
             display: flex;
             align-items: center;
@@ -64,9 +63,8 @@
 
         /* --- Smartphone Mockup for Desktop --- */
         #chat-app {
-            /* Spans the full height of the container minus the 2vh top/bottom padding */
             height: 100%; 
-            aspect-ratio: var(--phone-ratio); /* Matches the inverse of the user's screen */
+            aspect-ratio: 9 / 19; 
             background: #f8f9fa;
             border-radius: 40px;
             border: 10px solid #2f3542;
@@ -155,14 +153,14 @@
         .highlight-adj {
             background-color: #ffeaa7;
             color: #d63031;
-            padding: 0.2vh 0.6vw; /* Slightly tweaked padding for visual balance */
+            padding: 0.2vh 0.8vw;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             border-bottom: 2px solid #fdcb6e;
             transition: all 0.2s;
             display: inline-block;
-            margin: 0 0.1vw; /* Reduced margin so punctuation sits naturally close */
+            margin: 0 0.2vw;
         }
         
         .highlight-adj:hover {
@@ -238,7 +236,7 @@
             flex-wrap: wrap;
             gap: 0.5vh;
             min-height: 4vh;
-            padding: 0.5vh 1vw 1vh 1vw; /* Added bottom padding to prevent shadow clipping */
+            padding: 0.5vh 1vw 1vh 1vw;
             align-items: center;
         }
 
@@ -275,7 +273,7 @@
             gap: 1vh;
             max-height: 25vh;
             overflow-y: auto;
-            padding: 0.5vh 0.5vh 1.5vh 0.5vh; /* Added padding to prevent shadow clipping inside the scroll area */
+            padding: 0.5vh 0.5vh 1.5vh 0.5vh;
         }
 
         .word-tile {
@@ -290,7 +288,6 @@
             border: 1px solid #dfe4ea;
             user-select: none;
             transition: all 0.1s;
-            white-space: nowrap; /* Ensures text and punctuation inside the tile never breaks to a new line */
         }
         .word-tile:active { transform: translateY(3px); box-shadow: 0 0px 0 #ced6e0; }
 
@@ -331,7 +328,7 @@
             align-items: center;
             align-content: center;
             gap: 3vh 3vw;
-            padding-bottom: 0; /* Removed padding to prevent forced scrolling */
+            padding-bottom: 0;
         }
 
         .item-card {
@@ -345,10 +342,9 @@
             justify-content: center;
             padding: 2vh 2vw;
             
-            /* Set perfect card shape while preventing scroll */
             width: clamp(160px, 22vw, 260px);
             aspect-ratio: 3 / 4;
-            max-height: 42vh; /* Ensures 2 rows will always fit within 100vh */
+            max-height: 42vh;
             
             transition: all 0.3s var(--bounce);
             animation: popIn 0.5s var(--bounce) forwards;
@@ -368,9 +364,9 @@
         }
 
         .card-emoji {
-            font-size: 8vh; /* Adjusted down slightly to fit the new card ratio comfortably */
+            font-size: 8vh;
             line-height: 1;
-            margin-bottom: auto; /* Pushes succeeding elements down */
+            margin-bottom: auto;
             margin-top: 1vh;
         }
 
@@ -388,13 +384,13 @@
             flex-direction: column;
             width: 100%;
             gap: 1vh;
-            margin-top: auto; /* Pushes stats to bottom of the card */
+            margin-top: auto;
         }
 
         .stat-pill {
             background: #f1f2f6;
             color: #2f3542;
-            padding: 1.2vh; /* Snugger padding */
+            padding: 1.2vh;
             border-radius: 12px;
             font-size: 1.8vh;
             font-weight: 600;
@@ -475,7 +471,7 @@
             background: white;
             border-radius: 25px;
             width: 85vw;
-            max-width: 550px; /* Increased from 400px to make it wider on desktop */
+            max-width: 550px; 
             padding: 0;
             overflow: hidden;
             animation: popInZoom 0.4s var(--bounce) forwards;
@@ -486,20 +482,20 @@
         .grammar-header {
             background: var(--main-teal);
             color: white;
-            padding: 3vh; /* Slightly more padding */
+            padding: 3vh;
             text-align: center;
-            font-size: 4vh; /* Increased font size */
+            font-size: 4vh;
             font-weight: bold;
             letter-spacing: 1px;
         }
 
         .grammar-body {
-            padding: 4vh 3vw; /* More breathing room */
+            padding: 4vh 3vw; 
             text-align: center;
         }
 
         .grammar-translation {
-            font-size: 3.5vh; /* Increased font size */
+            font-size: 3.5vh; 
             font-weight: 700;
             color: #d63031;
             margin-bottom: 2.5vh;
@@ -511,7 +507,7 @@
             padding: 2.5vh;
             border-radius: 8px;
             text-align: left;
-            font-size: 2.4vh; /* Increased font size */
+            font-size: 2.4vh; 
             color: #2f3542;
             line-height: 1.6;
         }
@@ -520,7 +516,7 @@
             font-weight: bold;
             color: #ffa502;
             margin-bottom: 1.5vh;
-            font-size: 2.8vh; /* Increased font size */
+            font-size: 2.8vh; 
         }
 
         @keyframes popInZoom {
@@ -542,7 +538,7 @@
                 transform: translateY(calc(100% - 8vh));
                 transition: transform 0.4s var(--bounce);
                 z-index: 150;
-                display: block; /* Fix: Forces container to ignore shrink-to-fit flex rules */
+                display: block;
             }
 
             #chat-area-container.open {
@@ -551,8 +547,8 @@
 
             #chat-app {
                 width: 100%;
-                height: 100%; /* Overrides the min() height */
-                aspect-ratio: auto; /* Overrides the 10/16 ratio to fit screen */
+                height: 100%; 
+                aspect-ratio: auto; 
                 border-radius: 25px 25px 0 0;
                 border: none;
                 box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
@@ -591,30 +587,29 @@
             }
 
             #game-header {
-                margin-bottom: 2vh; /* Save vertical space on mobile */
+                margin-bottom: 2vh;
             }
 
             #cards-container {
                 gap: 2vh 4vw;
                 align-items: center;
                 align-content: center;
-                padding-bottom: 10vh; /* Just enough to clear the 8vh phone header */
+                padding-bottom: 10vh;
             }
 
             .item-card {
-                flex: 0 0 44%; /* Exact width to fit 2 per row nicely */
+                flex: 0 0 44%; 
                 width: 44%;
-                aspect-ratio: 3 / 4; /* Forces perfect card shape */
+                aspect-ratio: 3 / 4; 
                 height: auto; 
-                max-height: 35vh; /* Safe cap for mobile to stop scrolling */
+                max-height: 35vh; 
                 min-height: unset;
                 min-width: unset;
                 max-width: unset;
                 padding: 1.5vh 2vw;
-                justify-content: center; /* Centers content like it used to */
+                justify-content: center; 
             }
             
-            /* Overriding desktop auto-margins to restore the compact "card" look */
             .card-emoji { font-size: 6vh; margin: 0 0 0.5vh 0; }
             .card-name { font-size: 2.2vh; margin: 0 0 1vh 0; }
             .card-stats { gap: 0.8vh; margin: 0; }
@@ -639,7 +634,6 @@
         <button class="btn" style="background: #1e90ff; border-color: #0984e3; box-shadow: 0 6px 0 #0984e3;" onclick="resetGame()">Play Again 🔄</button>
     </div>
 
-    <!-- Grammar Modal -->
     <div id="grammar-modal" class="modal-backdrop" style="display: none; z-index: 700;" onclick="closeGrammarModal()">
         <div class="grammar-card" onclick="event.stopPropagation()">
             <div class="grammar-header" id="grammar-word-title">Word</div>
@@ -691,24 +685,6 @@
     </div>
 
     <script>
-        /* --- Dynamic Phone Aspect Ratio --- */
-        function updatePhoneRatio() {
-            if (window.innerWidth > 850) {
-                // Read the active window dimensions instead of physical screen dimensions
-                const windowW = window.innerWidth;
-                const windowH = window.innerHeight;
-                
-                // Ensure we get the portrait representation (smaller / larger) 
-                // This makes the phone look like the user's window turned sideways
-                const portraitW = Math.min(windowW, windowH);
-                const portraitH = Math.max(windowW, windowH);
-                
-                document.documentElement.style.setProperty('--phone-ratio', `${portraitW} / ${portraitH}`);
-            }
-        }
-        window.addEventListener('resize', updatePhoneRatio);
-        updatePhoneRatio(); // Trigger on load
-
         /* --- Game & Grammar Data --- */
         const gameData = {
             animals: {
@@ -837,9 +813,8 @@
 
         function playSound(type) {
             if (audioObjects[type]) {
-                // Clone the node so rapid clicking (like typing) overlaps correctly
                 const soundNode = audioObjects[type].cloneNode();
-                soundNode.volume = 0.5; // Soften volume slightly
+                soundNode.volume = 0.5; 
                 soundNode.play().catch(e => console.log("Audio play prevented until user interacts."));
             }
         }
@@ -863,17 +838,15 @@
             let replacements = [];
 
             keys.forEach((key) => {
-                // Match the key, plus any trailing punctuation to keep them bound together
-                const regex = new RegExp(`\\b(${key})\\b([.,!?]*)`, 'gi');
-                tempText = tempText.replace(regex, (match, p1, p2) => {
-                    replacements.push({ match: p1, key: key, punc: p2 });
+                const regex = new RegExp(`\\b${key}\\b`, 'gi');
+                tempText = tempText.replace(regex, (match) => {
+                    replacements.push({ match: match, key: key });
                     return `__PLACEHOLDER_${replacements.length - 1}__`;
                 });
             });
 
             replacements.forEach((rep, index) => {
-                // Wrap both the interactive element AND the punctuation inside a nowrap span
-                const htmlTag = `<span style="white-space: nowrap;"><span class="highlight-adj" onclick="openGrammarModal('${rep.key}', event)">${rep.match}</span>${rep.punc}</span>`;
+                const htmlTag = `<span class="highlight-adj" onclick="openGrammarModal('${rep.key}', event)">${rep.match}</span>`;
                 tempText = tempText.replace(`__PLACEHOLDER_${index}__`, htmlTag);
             });
 
@@ -897,7 +870,7 @@
 
             const modal = document.getElementById('grammar-modal');
             modal.style.display = 'flex';
-            void modal.offsetWidth; // Trigger reflow
+            void modal.offsetWidth; 
             modal.style.opacity = '1';
         };
 
@@ -953,7 +926,6 @@
             bubble.className = `bubble ${className}`;
             bubble.innerHTML = formatChatText(text);
             
-            // Play 'pop' for all bot/system bubbles
             if (className !== "user-bubble" && className !== "typing-indicator") {
                 playSound('pop');
             }
@@ -970,7 +942,7 @@
             typingDiv.id = 'typing-indicator';
             typingDiv.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
             
-            playSound('pop'); // Play 'pop' when the indicator first appears
+            playSound('pop'); 
             chat.appendChild(typingDiv);
             scrollToBottom();
 
@@ -1023,7 +995,6 @@
             const statKeys = Object.keys(category.statConfig);
             const targetStat = statKeys[Math.floor(Math.random() * statKeys.length)];
             
-            // Determine Round Type (Comparative, Superlative, or Equal)
             let roundType = 'comparative';
             if (numItems > 2) {
                 roundType = 'superlative';
@@ -1034,7 +1005,6 @@
             let usedValues = new Set();
             let equalValue = -1;
             
-            // If it's an equal round, pre-generate the matching stat
             if (roundType === 'equal') {
                 equalValue = randomInt(selectedItems[0].stats[targetStat][0], selectedItems[0].stats[targetStat][1]);
             }
@@ -1069,8 +1039,10 @@
             const adjConfig = category.statConfig[targetStat];
             currentValidAnswers = [];
 
+            let adjForQuestion = isHigh ? adjConfig.high : adjConfig.low;
+
             if (roundType === 'equal') {
-                question = `Look at the cards! How do they compare?`;
+                question = `Look at the cards! Which is ${adjForQuestion}?`;
                 let adj = `as ${adjConfig.base} as`;
                 baseSentence = `The ${selectedItems[0].name} is ${adj} the ${selectedItems[1].name}.`;
                 
@@ -1080,10 +1052,9 @@
             } else if (roundType === 'comparative') {
                 winner = isHigh ? selectedItems[1] : selectedItems[0];
                 loser = isHigh ? selectedItems[0] : selectedItems[1];
-                let adj = isHigh ? adjConfig.high : adjConfig.low;
                 
-                question = `Look at the cards! Which is ${adj}?`;
-                baseSentence = `The ${winner.name} is ${adj} than the ${loser.name}.`;
+                question = `Look at the cards! Which is ${adjForQuestion}?`;
+                baseSentence = `The ${winner.name} is ${adjForQuestion} than the ${loser.name}.`;
                 currentValidAnswers.push(baseSentence);
             } else {
                 winner = isHigh ? selectedItems[numItems - 1] : selectedItems[0];
@@ -1097,27 +1068,28 @@
             let correctWords = baseSentence.split(" ");
             let distractors = [];
             
-            // Ensure ALL cards have their names in the word bank
             selectedItems.forEach(item => distractors.push(item.name));
 
             if (roundType === 'equal') {
-                distractors.push(adjConfig.high);
+                distractors.push(adjForQuestion);
                 distractors.push("than");
-                distractors.push(adjConfig.lowest);
+                distractors.push(isHigh ? adjConfig.highest : adjConfig.lowest);
             } else if (roundType === 'comparative') {
                 distractors.push(isHigh ? adjConfig.low : adjConfig.high);
                 distractors.push(isHigh ? adjConfig.highest : adjConfig.lowest);
                 if (adjConfig.high.includes("more")) distractors.push("most");
-                distractors.push("as"); // Distractor for comparative
+                distractors.push("as"); 
+                distractors.push(adjConfig.base);
             } else {
                 distractors.push(isHigh ? adjConfig.lowest : adjConfig.highest);
                 distractors.push(isHigh ? adjConfig.high : adjConfig.low);
                 distractors.push("than");
             }
 
+            // Only deduplicate the distractors so we don't accidentally delete the second 'as' from correctWords
+            distractors = [...new Set(distractors)]; 
             distractors = distractors.filter(d => !correctWords.includes(d));
             let fullBank = [...correctWords, ...distractors];
-            fullBank = [...new Set(fullBank)]; // Remove duplicates
             fullBank = shuffleArray(fullBank);
 
             showTypingIndicator(() => {
@@ -1173,7 +1145,6 @@
             playSound('tap');
             if (window.innerWidth <= 850) {
                 setMobileChatState(true);
-                // Wait for the chat to slide up before typing
                 setTimeout(() => {
                     animateCardWordsInsertion(item.name);
                 }, 400); 
@@ -1189,14 +1160,12 @@
             const builder = document.getElementById('sentence-builder');
             const bank = document.getElementById('word-bank');
 
-            // Look for the tile in both the bank and the builder
             const allTiles = [...Array.from(bank.children), ...Array.from(builder.children)];
             let nameTile = allTiles.find(t => {
                 let cleanText = t.innerText.replace(/[.,!?]/g, '');
                 return cleanText.toLowerCase() === itemName.toLowerCase();
             });
 
-            // Fallback: If for some reason the tile doesn't exist, create it in the bank
             if (!nameTile) {
                 nameTile = document.createElement('div');
                 nameTile.className = 'word-tile';
@@ -1207,7 +1176,6 @@
 
             let tilesToMove = [];
             
-            // Only auto-add articles if the noun tile is coming from the word bank (newly added)
             if (nameTile.parentElement === bank) {
                 const isFirstWord = builder.children.length === 0;
                 if (isFirstWord) {
@@ -1224,7 +1192,6 @@
             
             tilesToMove.push(nameTile);
 
-            // Type out the tiles with a sequential animation
             tilesToMove.forEach((tile, index) => {
                 setTimeout(() => {
                     if (tile.parentElement === bank) {
@@ -1353,7 +1320,6 @@
         };
 
         function processIncorrectTiles(tiles) {
-            // Find the best matching valid answer (important since 'equal' rounds have 2 valid structures)
             let bestMatch = currentValidAnswers[0];
             let maxMatchLen = 0;
 
@@ -1374,7 +1340,6 @@
                 }
             });
 
-            // Retain tiles that match the beginning of the best matching sentence
             let builtString = "";
             let maxMatch = 0;
 
