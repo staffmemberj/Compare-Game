@@ -723,8 +723,8 @@
                     { name: "rabbit", emoji: "🐇", stats: { weight: [2, 10], speed: [30, 50] } }
                 ],
                 statConfig: {
-                    weight: { label: "Weight (kg)", high: "heavier", low: "lighter", highest: "the heaviest", lowest: "the lightest" },
-                    speed: { label: "Speed (km/h)", high: "faster", low: "slower", highest: "the fastest", lowest: "the slowest" }
+                    weight: { label: "Weight (kg)", base: "heavy", high: "heavier", low: "lighter", highest: "the heaviest", lowest: "the lightest" },
+                    speed: { label: "Speed (km/h)", base: "fast", high: "faster", low: "slower", highest: "the fastest", lowest: "the slowest" }
                 }
             },
             vehicles: {
@@ -738,8 +738,8 @@
                     { name: "bus", emoji: "🚌", stats: { price: [20000, 80000], speed: [80, 120] } }
                 ],
                 statConfig: {
-                    price: { label: "Price ($)", high: "more expensive", low: "cheaper", highest: "the most expensive", lowest: "the cheapest" },
-                    speed: { label: "Speed (km/h)", high: "faster", low: "slower", highest: "the fastest", lowest: "the slowest" }
+                    price: { label: "Price ($)", base: "expensive", high: "more expensive", low: "cheaper", highest: "the most expensive", lowest: "the cheapest" },
+                    speed: { label: "Speed (km/h)", base: "fast", high: "faster", low: "slower", highest: "the fastest", lowest: "the slowest" }
                 }
             },
             foods: {
@@ -753,8 +753,8 @@
                     { name: "watermelon", emoji: "🍉", stats: { price: [4, 10], weight: [2000, 5000] } }
                 ],
                 statConfig: {
-                    price: { label: "Price ($)", high: "more expensive", low: "cheaper", highest: "the most expensive", lowest: "the cheapest" },
-                    weight: { label: "Weight (g)", high: "heavier", low: "lighter", highest: "the heaviest", lowest: "the lightest" }
+                    price: { label: "Price ($)", base: "expensive", high: "more expensive", low: "cheaper", highest: "the most expensive", lowest: "the cheapest" },
+                    weight: { label: "Weight (g)", base: "heavy", high: "heavier", low: "lighter", highest: "the heaviest", lowest: "the lightest" }
                 }
             }
         };
@@ -771,7 +771,10 @@
             "more expensive": { ja: "より値段が高い (expensive)", type: "more" },
             "cheaper": { ja: "より安い (cheap)", type: "er" },
             "the most expensive": { ja: "一番値段が高い (expensive)", type: "most" },
-            "the cheapest": { ja: "一番安い (cheap)", type: "est" }
+            "the cheapest": { ja: "一番安い (cheap)", type: "est" },
+            "as heavy as": { ja: "同じくらい重い (heavy)", type: "asas" },
+            "as fast as": { ja: "同じくらい速い (fast)", type: "asas" },
+            "as expensive as": { ja: "同じくらい値段が高い (expensive)", type: "asas" }
         };
 
         const ruleDescriptions = {
@@ -790,6 +793,10 @@
             "most": {
                 title: "most の使い方",
                 desc: "長い単語の前に <b>most</b> をおいて、「一番〜」という意味にします。言葉の前に <b>the</b> が必要です。<br><br><small>例: expensive → <b>the most</b> expensive</small>"
+            },
+            "asas": {
+                title: "as ~ as の使い方",
+                desc: "「as + 言葉 + as」で、「〜と同じくらい」という意味になります。<br><br><small>例: My dog is as big as yours.</small>"
             }
         };
 
@@ -1016,18 +1023,36 @@
             const statKeys = Object.keys(category.statConfig);
             const targetStat = statKeys[Math.floor(Math.random() * statKeys.length)];
             
+            // Determine Round Type (Comparative, Superlative, or Equal)
+            let roundType = 'comparative';
+            if (numItems > 2) {
+                roundType = 'superlative';
+            } else if (Math.random() > 0.5) {
+                roundType = 'equal';
+            }
+
             let usedValues = new Set();
+            let equalValue = -1;
+            
+            // If it's an equal round, pre-generate the matching stat
+            if (roundType === 'equal') {
+                equalValue = randomInt(selectedItems[0].stats[targetStat][0], selectedItems[0].stats[targetStat][1]);
+            }
+
             selectedItems.forEach(item => {
                 item.currentStats = {};
                 statKeys.forEach(stat => {
                     let val;
                     if (stat === targetStat) {
-                        val = randomInt(item.stats[stat][0], item.stats[stat][1]);
-                        // Failsafe to prevent endless loop if stat ranges are too narrow
-                        while (usedValues.has(val)) {
-                            val++;
+                        if (roundType === 'equal') {
+                            val = equalValue;
+                        } else {
+                            val = randomInt(item.stats[stat][0], item.stats[stat][1]);
+                            while (usedValues.has(val)) {
+                                val++;
+                            }
+                            usedValues.add(val);
                         }
-                        usedValues.add(val);
                     } else {
                         val = randomInt(item.stats[stat][0], item.stats[stat][1]);
                     }
@@ -1042,23 +1067,32 @@
             
             let winner, loser, question, baseSentence;
             const adjConfig = category.statConfig[targetStat];
+            currentValidAnswers = [];
 
-            if (numItems === 2) {
+            if (roundType === 'equal') {
+                question = `Look at the cards! How do they compare?`;
+                let adj = `as ${adjConfig.base} as`;
+                baseSentence = `The ${selectedItems[0].name} is ${adj} the ${selectedItems[1].name}.`;
+                
+                // Both orders are correct for an equality sentence
+                currentValidAnswers.push(`The ${selectedItems[0].name} is ${adj} the ${selectedItems[1].name}.`);
+                currentValidAnswers.push(`The ${selectedItems[1].name} is ${adj} the ${selectedItems[0].name}.`);
+            } else if (roundType === 'comparative') {
                 winner = isHigh ? selectedItems[1] : selectedItems[0];
                 loser = isHigh ? selectedItems[0] : selectedItems[1];
                 let adj = isHigh ? adjConfig.high : adjConfig.low;
                 
                 question = `Look at the cards! Which is ${adj}?`;
                 baseSentence = `The ${winner.name} is ${adj} than the ${loser.name}.`;
+                currentValidAnswers.push(baseSentence);
             } else {
                 winner = isHigh ? selectedItems[numItems - 1] : selectedItems[0];
                 let adj = isHigh ? adjConfig.highest : adjConfig.lowest;
                 
                 question = `Look at all the cards! Which is ${adj}?`;
                 baseSentence = `The ${winner.name} is ${adj}.`;
+                currentValidAnswers.push(baseSentence);
             }
-
-            currentValidAnswers = [baseSentence];
 
             let correctWords = baseSentence.split(" ");
             let distractors = [];
@@ -1066,10 +1100,15 @@
             // Ensure ALL cards have their names in the word bank
             selectedItems.forEach(item => distractors.push(item.name));
 
-            if (numItems === 2) {
+            if (roundType === 'equal') {
+                distractors.push(adjConfig.high);
+                distractors.push("than");
+                distractors.push(adjConfig.lowest);
+            } else if (roundType === 'comparative') {
                 distractors.push(isHigh ? adjConfig.low : adjConfig.high);
                 distractors.push(isHigh ? adjConfig.highest : adjConfig.lowest);
                 if (adjConfig.high.includes("more")) distractors.push("most");
+                distractors.push("as"); // Distractor for comparative
             } else {
                 distractors.push(isHigh ? adjConfig.lowest : adjConfig.highest);
                 distractors.push(isHigh ? adjConfig.high : adjConfig.low);
@@ -1299,6 +1338,8 @@
                         hint += " Remember to start with 'The'.";
                     } else if (userSentence.includes("than") && !userSentence.match(/er\b|more\b/)) {
                         hint += " If you use 'than', you need a comparative word!";
+                    } else if (userSentence.includes("as") && !userSentence.match(/as .* as/)) {
+                        hint += " Remember to use 'as' before AND after the describing word!";
                     }
 
                     addBubble(`${hint} Let's try again!`, "bot-bubble");
@@ -1312,13 +1353,34 @@
         };
 
         function processIncorrectTiles(tiles) {
-            const validAnswer = currentValidAnswers[0];
+            // Find the best matching valid answer (important since 'equal' rounds have 2 valid structures)
+            let bestMatch = currentValidAnswers[0];
+            let maxMatchLen = 0;
+
+            currentValidAnswers.forEach(validAns => {
+                let builtString = "";
+                let matchLen = 0;
+                for (let i = 0; i < tiles.length; i++) {
+                    builtString += (i > 0 ? " " : "") + tiles[i].innerText;
+                    if (validAns === builtString || validAns.startsWith(builtString + " ")) {
+                        matchLen = i + 1;
+                    } else {
+                        break;
+                    }
+                }
+                if (matchLen > maxMatchLen) {
+                    maxMatchLen = matchLen;
+                    bestMatch = validAns;
+                }
+            });
+
+            // Retain tiles that match the beginning of the best matching sentence
             let builtString = "";
             let maxMatch = 0;
 
             for (let i = 0; i < tiles.length; i++) {
                 builtString += (i > 0 ? " " : "") + tiles[i].innerText;
-                if (validAnswer === builtString || validAnswer.startsWith(builtString + " ")) {
+                if (bestMatch === builtString || bestMatch.startsWith(builtString + " ")) {
                     maxMatch = i + 1;
                 } else {
                     break;
@@ -1350,17 +1412,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
