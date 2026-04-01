@@ -345,11 +345,10 @@
             justify-content: center;
             padding: 2vh 2vw;
             
-            /* Fill space while maintaining card look */
-            flex: 1 1 30%; 
-            max-width: 350px;
-            min-width: 220px;
-            height: 38vh; /* Fixed height relative to screen to avoid scrolling */
+            /* Set perfect card shape while preventing scroll */
+            width: clamp(160px, 22vw, 260px);
+            aspect-ratio: 3 / 4;
+            max-height: 42vh; /* Ensures 2 rows will always fit within 100vh */
             
             transition: all 0.3s var(--bounce);
             animation: popIn 0.5s var(--bounce) forwards;
@@ -369,7 +368,7 @@
         }
 
         .card-emoji {
-            font-size: 10vh;
+            font-size: 8vh; /* Adjusted down slightly to fit the new card ratio comfortably */
             line-height: 1;
             margin-bottom: auto; /* Pushes succeeding elements down */
             margin-top: 1vh;
@@ -380,7 +379,7 @@
             font-weight: bold;
             text-transform: capitalize;
             color: var(--main-teal);
-            margin-bottom: 2vh;
+            margin-bottom: 1.5vh;
             text-align: center;
         }
 
@@ -388,16 +387,16 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            gap: 1.5vh;
+            gap: 1vh;
             margin-top: auto; /* Pushes stats to bottom of the card */
         }
 
         .stat-pill {
             background: #f1f2f6;
             color: #2f3542;
-            padding: 1.5vh;
+            padding: 1.2vh; /* Snugger padding */
             border-radius: 12px;
-            font-size: 2vh;
+            font-size: 1.8vh;
             font-weight: 600;
             text-align: center;
             display: flex;
@@ -405,7 +404,7 @@
         }
         
         .stat-label {
-            font-size: 1.4vh;
+            font-size: 1.2vh;
             color: #747d8c;
             text-transform: uppercase;
             margin-bottom: 0.4vh;
@@ -605,7 +604,9 @@
             .item-card {
                 flex: 0 0 44%; /* Exact width to fit 2 per row nicely */
                 width: 44%;
-                height: 36vh; /* Fixed height so 2 rows = 72vh. Fits perfectly without scrolling */
+                aspect-ratio: 3 / 4; /* Forces perfect card shape */
+                height: auto; 
+                max-height: 35vh; /* Safe cap for mobile to stop scrolling */
                 min-height: unset;
                 min-width: unset;
                 max-width: unset;
@@ -614,9 +615,9 @@
             }
             
             /* Overriding desktop auto-margins to restore the compact "card" look */
-            .card-emoji { font-size: 6vh; margin: 0 0 1vh 0; }
-            .card-name { font-size: 2.2vh; margin: 0 0 1.5vh 0; }
-            .card-stats { gap: 1vh; margin: 0; }
+            .card-emoji { font-size: 6vh; margin: 0 0 0.5vh 0; }
+            .card-name { font-size: 2.2vh; margin: 0 0 1vh 0; }
+            .card-stats { gap: 0.8vh; margin: 0; }
             .stat-pill { font-size: 1.5vh; padding: 1vh; }
             .stat-label { font-size: 1.1vh; margin-bottom: 0.2vh; }
         }
@@ -1349,6 +1350,7 @@
     </script>
 </body>
 </html>
+
 
 
 
